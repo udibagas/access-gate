@@ -1,5 +1,6 @@
 const router = require("express").Router();
 
+router.use("/accessLogs", require("./accessLogs"));
 router.use("/cameras", require("./cameras"));
 router.use("/gates", require("./gates"));
 router.use("/members", require("./members"));

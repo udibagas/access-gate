@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       phone: DataTypes.STRING,
       cardNumber: DataTypes.STRING,
       vehicleNumber: DataTypes.STRING,
-      gender: DataTypes.STRING,
+      gender: DataTypes.ENUM("M", "F"),
       status: DataTypes.BOOLEAN,
       expiryDate: DataTypes.DATE,
       group: DataTypes.STRING,
