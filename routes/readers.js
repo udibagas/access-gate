@@ -1,14 +1,14 @@
 const { Op } = require("sequelize");
 const { auth } = require("../middlewares/auth.middleware");
-const { Gate } = require("../models");
+const { Reader } = require("../models");
 const router = require("express").Router();
 
 router
   .use(auth)
   .get("/", async (req, res, next) => {
     try {
-      const gates = await Gate.findAll({ order: [["name", "asc"]] });
-      return res.status(200).json(gates);
+      const readers = await Reader.findAll({ order: [["name", "asc"]] });
+      return res.status(200).json(readers);
     } catch (error) {
       next(error);
     }
@@ -16,8 +16,8 @@ router
 
   .post("/", async (req, res, next) => {
     try {
-      const gate = await Gate.create(req.body);
-      res.status(201).json(gate);
+      const reader = await Reader.create(req.body);
+      res.status(201).json(reader);
     } catch (error) {
       next(error);
     }
@@ -25,16 +25,16 @@ router
 
   .put("/:id", async (req, res, next) => {
     try {
-      const gate = await Gate.findByPk(req.params.id);
+      const reader = await Reader.findByPk(req.params.id);
 
-      if (!gate) {
-        const error = new Error("Gate not found");
+      if (!reader) {
+        const error = new Error("Reader not found");
         error.status = 404;
         throw error;
       }
 
-      await gate.update(req.body);
-      res.status(200).json(gate);
+      await reader.update(req.body);
+      res.status(200).json(reader);
     } catch (error) {
       next(error);
     }
@@ -42,15 +42,15 @@ router
 
   .delete("/:id", async (req, res, next) => {
     try {
-      const gate = await Gate.findByPk(req.params.id);
+      const reader = await Reader.findByPk(req.params.id);
 
-      if (!gate) {
-        const error = new Error("Gate not found");
+      if (!reader) {
+        const error = new Error("Reader not found");
         error.status = 404;
         throw error;
       }
 
-      await gate.destroy();
+      await reader.destroy();
       res.status(204).end();
     } catch (error) {
       next(error);
