@@ -10,6 +10,7 @@ import moment from "moment";
 import StatusTag from "../../components/StatusTag";
 import { useCallback } from "react";
 import dayjs from "dayjs";
+import { Input } from "antd";
 
 export default function MemberTable() {
   const {
@@ -24,6 +25,8 @@ export default function MemberTable() {
     handleEdit,
     handleDelete,
     handleAdd,
+    setCurrentPage,
+    setSearch,
   } = useDataTableContext()
 
   const prepareEdit = useCallback((record: Member) => {
@@ -78,6 +81,15 @@ export default function MemberTable() {
     <>
       <PageHeader title="Kelola Member">
         <AddButton label="Buat Member Baru" onClick={handleAdd} />
+        <Input.Search
+          placeholder="Cari member"
+          allowClear
+          onSearch={(value) => {
+            setCurrentPage(1)
+            setSearch(value)
+          }}
+          style={{ width: 200 }}
+        />
       </PageHeader>
 
       <DataTable<Member> columns={columns} paginated={true} />

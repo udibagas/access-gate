@@ -17,7 +17,12 @@ router
 
     if (search) {
       options.where = {
-        [Op.or]: [{ name: { [Op.iLike]: `%${search}%` } }],
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${search}%` } },
+          { phone: { [Op.iLike]: `%${search}%` } },
+          { cardNumber: { [Op.iLike]: `%${search}%` } },
+          { vehicleNumber: { [Op.iLike]: `%${search}%` } },
+        ],
       };
     }
 
