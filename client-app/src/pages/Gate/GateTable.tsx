@@ -7,7 +7,7 @@ import PageHeader from "../../components/PageHeader";
 import GateForm from "./GateForm";
 import { useDataTableContext } from "../../hooks/useDataTable";
 
-export default function UserTable() {
+export default function GateTable() {
   const {
     currentPage,
     showForm,

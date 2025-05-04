@@ -22,8 +22,8 @@ const menuItems: MenuItem[] = [
         icon: <Camera />,
       },
       {
-        label: <Link to="/member">Member</Link>,
-        key: "/member",
+        label: <Link to="/members">Member</Link>,
+        key: "/members",
         icon: <User />,
       },
       {

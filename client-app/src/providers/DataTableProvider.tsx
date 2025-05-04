@@ -69,7 +69,8 @@ export function DataTableProvider<T extends { id: number }>({ url, paginated = f
         string | number | boolean | Dayjs | null | number[]
       > = {}
     ) => {
-      form.setFieldsValue({ ...data, ...additionalData });
+      const values = { ...data, ...additionalData }
+      form.setFieldsValue(values);
       setIsEditing(true);
       setShowForm(true);
     },

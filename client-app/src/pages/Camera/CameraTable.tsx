@@ -7,7 +7,7 @@ import PageHeader from "../../components/PageHeader";
 import CameraForm from "./CameraForm";
 import { useDataTableContext } from "../../hooks/useDataTable";
 
-export default function UserTable() {
+export default function CameraTable() {
   const {
     currentPage,
     showForm,

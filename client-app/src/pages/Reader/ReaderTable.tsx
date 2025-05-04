@@ -1,13 +1,14 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import ActionButton from "../../components/buttons/ActionButton";
 import AddButton from "../../components/buttons/AddButton";
-import { Reader } from "../../types";
+import { Camera, Reader } from "../../types";
 import DataTable from "../../components/DataTable";
 import PageHeader from "../../components/PageHeader";
 import ReaderForm from "./ReaderForm";
 import { useDataTableContext } from "../../hooks/useDataTable";
+import { useCallback } from "react";
 
-export default function UserTable() {
+export default function ReaderTable() {
   const {
     currentPage,
     showForm,
@@ -21,6 +22,12 @@ export default function UserTable() {
     handleDelete,
     handleAdd,
   } = useDataTableContext()
+
+  const prepareEdit = useCallback((record: Reader) => {
+    return handleEdit(record, {
+      cameras: record.cameras ? record.cameras.map((camera: Camera) => camera.id) : null,
+    });
+  }, [handleEdit]);
 
   const columns = [
     {
@@ -40,7 +47,7 @@ export default function UserTable() {
       width: 80,
       render: (_: string, record: Reader) => (
         <ActionButton
-          onEdit={() => handleEdit(record)}
+          onEdit={() => prepareEdit(record)}
           onDelete={() => handleDelete(record.id)}
         />
       ),

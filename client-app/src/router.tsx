@@ -11,6 +11,7 @@ const Users = lazy(() => import('./pages/Users/Users'))
 const Gates = lazy(() => import('./pages/Gate/Gates'))
 const Cameras = lazy(() => import('./pages/Camera/Cameras'))
 const Readers = lazy(() => import('./pages/Reader/Readers'))
+const Members = lazy(() => import('./pages/Member/Members'))
 
 const authLoader = async () => {
   try {
@@ -33,6 +34,8 @@ export const router = createBrowserRouter([
       { path: '/gates', element: <Gates /> },
       { path: '/cameras', element: <Cameras /> },
       { path: '/readers', element: <Readers /> },
+      { path: '/members', element: <Members /> },
+      { path: '*', element: <>Not Found</> },
     ],
   },
   {

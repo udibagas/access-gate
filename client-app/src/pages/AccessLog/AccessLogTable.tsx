@@ -6,7 +6,7 @@ import { Input } from "antd";
 import { useDataTableContext } from "../../hooks/useDataTable";
 import { AccessLogType } from "../../types";
 
-export default function UserTable() {
+export default function AccessLogTable() {
   const { refreshData, setSearch, setCurrentPage } = useDataTableContext()
 
   const columns = [
