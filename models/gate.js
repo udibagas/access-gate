@@ -9,8 +9,23 @@ module.exports = (sequelize, DataTypes) => {
 
   Gate.init(
     {
-      name: DataTypes.STRING,
-      device: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: "Nama gate harus diisi" },
+          notNull: { msg: "Nama gate harus diisi" },
+        },
+      },
+      device: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: { msg: "Device sudah terdaftar" },
+        validate: {
+          notEmpty: { msg: "Device harus diisi" },
+          notNull: { msg: "Device harus diisi" },
+        },
+      },
     },
     {
       sequelize,

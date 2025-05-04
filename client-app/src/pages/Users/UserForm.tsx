@@ -7,12 +7,12 @@ export default function UserForm({ visible, isEditing, onCancel, onOk, errors, f
   return (
     <Modal
       width={450}
-      title={isEditing ? "Edit User" : "Create New User"}
+      title={isEditing ? "Edit User" : "Buat User Baru"}
       open={visible}
       onCancel={onCancel}
       footer={[
-        <CancelButton label="Cancel" onCancel={onCancel} key='back' />,
-        <SaveButton label={isEditing ? "Update" : "Create"} key='submit' />,
+        <CancelButton label="Batal" onCancel={onCancel} key='back' />,
+        <SaveButton label='Simpan' key='submit' />,
       ]}
     >
       <Form
@@ -24,7 +24,7 @@ export default function UserForm({ visible, isEditing, onCancel, onOk, errors, f
         labelCol={{ span: 6 }}
         labelAlign="left"
         colon={false}
-        className="my-8"
+        style={{ marginTop: 24 }}
       >
         <Form.Item name="id" hidden>
           <Input />
@@ -35,14 +35,6 @@ export default function UserForm({ visible, isEditing, onCancel, onOk, errors, f
           name="name"
           validateStatus={errors.name ? "error" : ""}
           help={errors.name?.join(", ")}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          label="Email"
-          name="email"
-          validateStatus={errors.email ? "error" : ""}
-          help={errors.email?.join(", ")}
         >
           <Input />
         </Form.Item>

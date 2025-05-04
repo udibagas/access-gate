@@ -1,11 +1,10 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import ActionButton from "../../components/buttons/ActionButton";
 import AddButton from "../../components/buttons/AddButton";
-import { UserType } from "../../types";
+import { Camera } from "../../types";
 import DataTable from "../../components/DataTable";
 import PageHeader from "../../components/PageHeader";
-import UserForm from "./UserForm";
-import { Input } from "antd";
+import CameraForm from "./CameraForm";
 import { useDataTableContext } from "../../hooks/useDataTable";
 
 export default function UserTable() {
@@ -21,24 +20,24 @@ export default function UserTable() {
     handleEdit,
     handleDelete,
     handleAdd,
-    setSearch,
-    setCurrentPage,
   } = useDataTableContext()
 
   const columns = [
     {
       title: "No.",
       width: 60,
-      render: (_: string, __: UserType, index: number) => (currentPage - 1) * 10 + index + 1,
+      render: (_: string, __: Camera, index: number) => (currentPage - 1) * 10 + index + 1,
     },
-    { title: "Name", dataIndex: "name", key: "name" },
-    { title: "Role", dataIndex: "role", key: "role" },
+    { title: "Name", dataIndex: "name", key: "name", width: 150 },
+    { title: "URL", dataIndex: "url", key: "url", minWidth: 200 },
+    { title: "User", dataIndex: "user", key: "user", width: 150 },
+    { title: "Password", dataIndex: "password", key: "password", width: 150 },
     {
       title: <ReloadOutlined onClick={refreshData} />,
       key: "action",
       align: "center" as const,
       width: 80,
-      render: (_: string, record: UserType) => (
+      render: (_: string, record: Camera) => (
         <ActionButton
           onEdit={() => handleEdit(record)}
           onDelete={() => handleDelete(record.id)}
@@ -49,22 +48,13 @@ export default function UserTable() {
 
   return (
     <>
-      <PageHeader title="Manage Users">
-        <AddButton label="Create New User" onClick={handleAdd} />
-        <Input.Search
-          placeholder="Search"
-          allowClear
-          onSearch={(value) => {
-            setCurrentPage(1)
-            setSearch(value)
-          }}
-          style={{ width: 200 }}
-        />
+      <PageHeader title="Kelola Kamera">
+        <AddButton label="Buat Kamera Baru" onClick={handleAdd} />
       </PageHeader>
 
-      <DataTable<UserType> columns={columns} />
+      <DataTable<Camera> columns={columns} />
 
-      <UserForm
+      <CameraForm
         visible={showForm}
         isEditing={isEditing}
         errors={errors}

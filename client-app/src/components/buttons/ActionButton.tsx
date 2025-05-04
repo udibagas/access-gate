@@ -18,7 +18,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ allowEdit = true, allowDele
   }
 
   if (allowDelete) {
-    items.push({ key: "delete", label: 'Delete', icon: <DeleteOutlined />, onClick: onDelete });
+    items.push({ key: "delete", label: 'Hapus', icon: <DeleteOutlined />, onClick: onDelete });
   }
 
   if (additionalItems) {

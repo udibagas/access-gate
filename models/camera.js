@@ -3,11 +3,6 @@ const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
   class Camera extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
       // define association here
     }
@@ -15,10 +10,39 @@ module.exports = (sequelize, DataTypes) => {
 
   Camera.init(
     {
-      name: DataTypes.STRING,
-      url: DataTypes.STRING,
-      user: DataTypes.STRING,
-      password: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: "Nama harus diisi" },
+          notNull: { msg: "Nama harus diisi" },
+        },
+      },
+      url: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: "URL harus diisi" },
+          notNull: { msg: "URL harus diisi" },
+          isUrl: { msg: "URL tidak valid" },
+        },
+      },
+      user: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: "User harus diisi" },
+          notNull: { msg: "User harus diisi" },
+        },
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: { msg: "Password harus diisi" },
+          notNull: { msg: "Password harus diisi" },
+        },
+      },
     },
     {
       sequelize,

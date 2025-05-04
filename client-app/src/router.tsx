@@ -9,6 +9,8 @@ const Login = lazy(() => import('./pages/Login'))
 const AuthLayout = lazy(() => import('./layouts/AuthLayout'))
 const Users = lazy(() => import('./pages/Users/Users'))
 const Gates = lazy(() => import('./pages/Gate/Gates'))
+const Cameras = lazy(() => import('./pages/Camera/Cameras'))
+const Readers = lazy(() => import('./pages/Reader/Readers'))
 
 const authLoader = async () => {
   try {
@@ -29,6 +31,8 @@ export const router = createBrowserRouter([
       { index: true, element: <AccessLog /> },
       { path: '/users', element: <Users /> },
       { path: '/gates', element: <Gates /> },
+      { path: '/cameras', element: <Cameras /> },
+      { path: '/readers', element: <Readers /> },
     ],
   },
   {

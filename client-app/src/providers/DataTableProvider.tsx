@@ -110,11 +110,11 @@ export function DataTableProvider<T extends { id: number }>({ url, paginated = f
   const handleDelete = useCallback(
     (id: number) => {
       Modal.confirm({
-        title: "Are you sure you want to delete this record?",
-        content: "This action cannot be undone.",
-        okText: "Yes",
+        title: "Anda yakin akan menghapus data ini?",
+        content: "Tindakan ini tidak dapat dibatalkan",
+        okText: "Ya",
         okType: "danger",
-        cancelText: "No",
+        cancelText: "Tidak",
         onOk: () => {
           deleteItem(url, id).then(() => {
             message.success("Record deleted successfully");

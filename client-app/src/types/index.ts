@@ -7,6 +7,14 @@ export interface Gate {
   device: string;
 }
 
+export interface Camera {
+  id: number;
+  name: string;
+  url: string;
+  user: string;
+  password: string;
+}
+
 export interface Reader {
   id: number;
   name: string;
@@ -14,6 +22,7 @@ export interface Reader {
   type: "IN" | "OUT";
   GateId: number;
   gate: Gate;
+  cameras: Camera[];
 }
 
 export interface Member {

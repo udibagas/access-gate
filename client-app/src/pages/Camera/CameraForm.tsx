@@ -1,13 +1,13 @@
 import { Modal, Form, Input } from "antd";
 import CancelButton from "../../components/buttons/CancelButton";
 import SaveButton from "../../components/buttons/SaveButton";
-import { CustomFormProps, Gate } from "../../types";
+import { CustomFormProps, Camera } from "../../types";
 
-export default function GateForm({ visible, isEditing, onCancel, onOk, errors, form }: CustomFormProps<Gate>) {
+export default function CameraForm({ visible, isEditing, onCancel, onOk, errors, form }: CustomFormProps<Camera>) {
   return (
     <Modal
       width={450}
-      title={isEditing ? "Edit Gate" : "Buat Gate Baru"}
+      title={isEditing ? "Edit Kamera" : "Buat Kamera Baru"}
       open={visible}
       onCancel={onCancel}
       footer={[
@@ -38,11 +38,30 @@ export default function GateForm({ visible, isEditing, onCancel, onOk, errors, f
         >
           <Input />
         </Form.Item>
+
         <Form.Item
-          label="Device"
-          name="device"
-          validateStatus={errors.device ? "error" : ""}
-          help={errors.device?.join(", ")}
+          label="URL"
+          name="url"
+          validateStatus={errors.url ? "error" : ""}
+          help={errors.url?.join(", ")}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="User"
+          name="user"
+          validateStatus={errors.user ? "error" : ""}
+          help={errors.user?.join(", ")}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Password"
+          name="password"
+          validateStatus={errors.password ? "error" : ""}
+          help={errors.password?.join(", ")}
         >
           <Input />
         </Form.Item>

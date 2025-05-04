@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const { auth } = require("../middlewares/auth.middleware");
 const { Reader } = require("../models");
 const router = require("express").Router();
@@ -7,7 +6,19 @@ router
   .use(auth)
   .get("/", async (req, res, next) => {
     try {
-      const readers = await Reader.findAll({ order: [["name", "asc"]] });
+      const readers = await Reader.findAll({
+        order: [["name", "asc"]],
+        include: [
+          "gate",
+          {
+            association: "cameras",
+            attributes: ["id", "name"],
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      });
       return res.status(200).json(readers);
     } catch (error) {
       next(error);
@@ -17,6 +28,7 @@ router
   .post("/", async (req, res, next) => {
     try {
       const reader = await Reader.create(req.body);
+      await reader.setCameras(req.body.cameras);
       res.status(201).json(reader);
     } catch (error) {
       next(error);
@@ -34,6 +46,7 @@ router
       }
 
       await reader.update(req.body);
+      await reader.setCameras(req.body.cameras);
       res.status(200).json(reader);
     } catch (error) {
       next(error);

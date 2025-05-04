@@ -46,8 +46,8 @@ export default function UserTable() {
 
   return (
     <>
-      <PageHeader title="Manage Gate">
-        <AddButton label="Create New Gate" onClick={handleAdd} />
+      <PageHeader title="Kelola Gate">
+        <AddButton label="Buat Gate Baru" onClick={handleAdd} />
       </PageHeader>
 
       <DataTable<Gate> columns={columns} />

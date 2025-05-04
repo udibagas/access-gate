@@ -32,13 +32,13 @@ const menuItems: MenuItem[] = [
         icon: <Cog />,
       },
       {
-        label: <Link to="/camera">Camera</Link>,
-        key: "/camera",
+        label: <Link to="/cameras">Camera</Link>,
+        key: "/cameras",
         icon: <Camera />,
       },
       {
-        label: <Link to="/card-reader">Card Reader</Link>,
-        key: "/card-reader",
+        label: <Link to="/readers">Card Reader</Link>,
+        key: "/readers",
         icon: <ScanQrCode />,
       },
       {
