@@ -6,6 +6,6 @@ router.use("/gates", require("./gates"));
 router.use("/members", require("./members"));
 router.use("/readers", require("./readers"));
 router.use("/users", require("./users"));
-router.use("/snapshots", require("./users"));
+router.use("/snapshots", require("./snapshots"));
 
 module.exports = router;

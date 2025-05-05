@@ -1,16 +1,11 @@
 "use strict";
-const { default: axios } = require("axios");
 const { Model } = require("sequelize");
 const fs = require("fs");
 const moment = require("moment");
-const AxiosDigestAuth = require("@mhoc/axios-digest-auth");
+const AxiosDigestAuth = require("@mhoc/axios-digest-auth").default;
 
 module.exports = (sequelize, DataTypes) => {
   class Camera extends Model {
-    static associate(models) {
-      // define association here
-    }
-
     async takeSnapshot(saveToFile = false) {
       const digestAuth = new AxiosDigestAuth({
         username: this.user,
