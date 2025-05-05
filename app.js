@@ -5,6 +5,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const cors = require("cors");
+const { Gate } = require("./models");
 
 var app = express();
 
@@ -38,5 +39,15 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(require("./middlewares/errorHandler.middleware"));
+
+Gate.findAll()
+  .then((gates) => {
+    gates.forEach((gate) => {
+      gate.scan();
+    });
+  })
+  .catch((error) => {
+    console.error("Error fetching gates:", error);
+  });
 
 module.exports = app;
