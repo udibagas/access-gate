@@ -1,7 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
-const SerialPort = require("serialport");
-const DelimiterParser = require("@serialport/parser-delimiter");
+const { SerialPort } = require("serialport");
+const { DelimiterParser } = require("@serialport/parser-delimiter");
 
 module.exports = (sequelize, DataTypes) => {
   class Gate extends Model {
