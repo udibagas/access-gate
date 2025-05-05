@@ -7,13 +7,20 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "MemberId",
         as: "member",
       });
+
       AccessLog.belongsTo(models.Gate, {
         foreignKey: "GateId",
         as: "gate",
       });
+
       AccessLog.belongsTo(models.Reader, {
         foreignKey: "ReaderId",
         as: "reader",
+      });
+
+      AccessLog.hasMany(models.Snapshot, {
+        foreignKey: "AccessLogId",
+        as: "snapshots",
       });
     }
   }
