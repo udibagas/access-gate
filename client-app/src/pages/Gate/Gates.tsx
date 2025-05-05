@@ -4,7 +4,7 @@ import { DataTableProvider } from "../../providers/DataTableProvider";
 import { useState } from "react";
 
 export default function Gates() {
-  const [log, setLog] = useState<string[]>([
+  const [log] = useState<string[]>([
     'Ini nanti log dari server',
     'Ini nanti log dari server',
     'Ini nanti log dari server',
