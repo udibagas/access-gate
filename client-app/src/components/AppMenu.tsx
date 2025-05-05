@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Menu, MenuProps } from 'antd';
-import { Camera, Cog, Database, Home, ScanQrCode, User } from 'lucide-react';
+import { Camera, Cog, Home, ScanQrCode, User } from 'lucide-react';
 import { Link } from 'react-router';
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -45,11 +45,6 @@ const menuItems: MenuItem[] = [
         label: <Link to="/users">Users</Link>,
         key: "/users",
         icon: <User />,
-      },
-      {
-        label: <Link to="/backup">Backup</Link>,
-        key: "/backup",
-        icon: <Database />,
       },
     ],
   },

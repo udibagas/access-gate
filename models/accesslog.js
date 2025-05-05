@@ -40,5 +40,23 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  AccessLog.afterCreate(async (log) => {
+    const { Reader, Snapshot } = sequelize.models;
+    const reader = await Reader.findByPk(log.ReaderId, {
+      include: "cameras",
+    });
+
+    reader.cameras.forEach(async (camera) => {
+      const filepath = await camera.takeSnapshot(true);
+      await Snapshot.create({
+        AccessLogId: log.id,
+        CameraId: camera.id,
+        filepath,
+      });
+    });
+
+    console.log("Snapshot created successfully");
+  });
+
   return AccessLog;
 };

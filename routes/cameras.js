@@ -54,6 +54,25 @@ router
     } catch (error) {
       next(error);
     }
+  })
+
+  .post("/:id/snapshot", async (req, res, next) => {
+    const { saveToFile } = req.body;
+
+    try {
+      const camera = await Camera.findByPk(req.params.id);
+
+      if (!camera) {
+        const error = new Error("Camera not found");
+        error.status = 404;
+        throw error;
+      }
+
+      const snapshot = await camera.takeSnapshot(saveToFile);
+      res.status(200).json(snapshot);
+    } catch (error) {
+      next(error);
+    }
   });
 
 module.exports = router;

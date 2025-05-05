@@ -1,10 +1,53 @@
 "use strict";
+const { default: axios } = require("axios");
 const { Model } = require("sequelize");
+const fs = require("fs");
+const moment = require("moment");
+const AxiosDigestAuth = require("@mhoc/axios-digest-auth");
 
 module.exports = (sequelize, DataTypes) => {
   class Camera extends Model {
     static associate(models) {
       // define association here
+    }
+
+    async takeSnapshot(saveToFile = false) {
+      const digestAuth = new AxiosDigestAuth({
+        username: this.user,
+        password: this.password,
+      });
+
+      const response = await digestAuth.request({
+        method: "GET",
+        url: this.url,
+        responseType: "arraybuffer",
+        headers: {
+          Accept: "image/jpeg",
+        },
+      });
+
+      console.log("Snapshot taken successfully");
+
+      if (saveToFile) {
+        const dir = fs.mkdirSync(`snapshots/` + moment().format("YYYY/MM/DD"), {
+          recursive: true,
+        });
+        const filePath = `${dir}/${this.name}-${Date.now()}.jpeg`;
+
+        fs.writeFile(filePath, response.data, (err) => {
+          if (err) {
+            return console.error("Error saving snapshot:", err);
+          }
+
+          console.log("Snapshot saved to", filePath);
+        });
+      }
+
+      // Convert arraybuffer to Base64
+      const base64Image = Buffer.from(response.data).toString("base64");
+
+      // Return Base64-encoded string
+      return `data:image/jpeg;base64,${base64Image}`;
     }
   }
 

@@ -62,12 +62,15 @@ export default function MemberForm({ visible, isEditing, onCancel, onOk, errors,
         </Form.Item>
 
         <Form.Item
-          label="Grup"
+          label="Group"
           name="group"
           validateStatus={errors.group ? "error" : ""}
           help={errors.group?.join(", ")}
         >
-          <Input placeholder="Grup" allowClear />
+          <Radio.Group>
+            <Radio value="admin">Admin</Radio>
+            <Radio value="member">Member</Radio>
+          </Radio.Group>
         </Form.Item>
 
         <Form.Item

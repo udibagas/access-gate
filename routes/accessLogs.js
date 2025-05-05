@@ -13,6 +13,20 @@ router
       order: [["updatedAt", "desc"]],
       limit: +limit,
       offset,
+      include: [
+        {
+          association: "member",
+          attributes: ["name"],
+        },
+        {
+          association: "gate",
+          attributes: ["name"],
+        },
+        {
+          association: "snapshots",
+          attributes: ["filepath"],
+        },
+      ],
     };
 
     if (search) {
@@ -42,23 +56,6 @@ router
     try {
       const accessLog = await AccessLog.create(req.body);
       res.status(201).json(accessLog);
-    } catch (error) {
-      next(error);
-    }
-  })
-
-  .put("/:id", async (req, res, next) => {
-    try {
-      const accessLog = await AccessLog.findByPk(req.params.id);
-
-      if (!accessLog) {
-        const error = new Error("AccessLog not found");
-        error.status = 404;
-        throw error;
-      }
-
-      await accessLog.update(req.body);
-      res.status(200).json(accessLog);
     } catch (error) {
       next(error);
     }

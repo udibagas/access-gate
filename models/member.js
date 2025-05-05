@@ -5,6 +5,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+
+    getLastLog() {
+      return sequelize.models.AccessLog.findOne({
+        where: { MemberId: this.id },
+        order: [["createdAt", "DESC"]],
+        limit: 1,
+      });
+    }
   }
 
   Member.init(
