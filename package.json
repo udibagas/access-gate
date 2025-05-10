@@ -23,6 +23,8 @@
     "pg": "^8.15.6",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.2",
-    "serialport": "^13.0.0"
+    "serialport": "^13.0.0",
+    "winston": "^3.17.0",
+    "ws": "^8.18.2"
   }
 }

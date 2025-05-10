@@ -1,73 +1,212 @@
 "use strict";
+const winston = require("winston");
+const moment = require("moment");
 const { Model } = require("sequelize");
-const { SerialPort } = require("serialport");
-const { DelimiterParser } = require("@serialport/parser-delimiter");
+const WebSocketTransport = require("../logger/WebsocketTransport");
+const MySocket = require("../lib/mysocket");
+const Audio = require("../lib/audio");
+const RunningText = require("../lib/runningtext");
+
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || "debug",
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(({ timestamp, level, message }) => {
+      const formattedTimestamp = moment(timestamp).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      return `${formattedTimestamp} [${level.toUpperCase()}] ${message}`;
+    })
+  ),
+  transports: [new winston.transports.Console(), new WebSocketTransport()],
+});
 
 module.exports = (sequelize, DataTypes) => {
   class Gate extends Model {
-    port;
+    state = "idle";
+    socket = new MySocket();
+    audio = new Audio(this.socket);
+    runningText = new RunningText(this.socket);
 
-    async reconnect() {
-      try {
-        await this.reload();
+    reconnect() {
+      this.socket.removeAllListeners();
+      this.socket.destroy();
 
-        if (this.port instanceof SerialPort) {
-          this.port = null;
-        }
+      setTimeout(() => {
+        this.connect();
+      }, 1000);
+    }
 
-        setTimeout(() => {
-          try {
-            this.scan();
-          } catch (error) {
-            console.error(`${this.name} - ERROR - ${error.message}`);
-          }
-        }, 1000);
-      } catch (error) {
-        console.error(`${this.name} - ERROR - ${error.message}`);
+    connect() {
+      logger.info(`${this.name}: Connecting to ${this.device}`);
+      this.socket.connect(5000, this.device, () => {
+        logger.info(`${this.name}: Connected to ${this.device}:${5000}`);
+      });
+
+      this.registerEventListeners();
+    }
+
+    registerEventListeners() {
+      this.socket.on("connect", () => {
+        logger.info(`${this.name}: Connected`);
+      });
+
+      this.socket.on("data", (data) => {
+        this.parseData(data);
+      });
+
+      this.socket.on("close", () => {
+        logger.error(
+          `${this.name}: Connection closed. Reconnecting to ${this.name}...`
+        );
+        this.reconnect();
+      });
+
+      this.socket.on("error", (err) => {
+        logger.error(
+          `${this.name}: Connection error. Reconnecting to ${this.name}...`
+        );
+        this.reconnect();
+      });
+    }
+
+    async parseData(data) {
+      logger.debug(`${this.name}: ${data.toString("utf-8")}`);
+      // remove header & footer
+      const stringData = data.toString().slice(1, -1);
+
+      // VEHICLE DETECTED
+      if (stringData.slice(0, 5) === "IN1ON") {
+        logger.info(`${this.name}: Vehicle detected`);
+        this.state = "vehicle_detected";
+        this.audio.playWelcome();
+        this.runningText.showWelcome();
+      }
+
+      // VEHICLE TURNED BACK
+      if (stringData.slice(0, 6) === "IN1OFF") {
+        logger.info(`${this.name}: Vehicle turned back or in`);
+        this.state = "idle";
+      }
+
+      // MEMBER CARD TAPPED
+      if (stringData[0] === "W") {
+        logger.info(`${this.name}: Member Card detected`);
+        if (this.state === "idle") return;
+        await this.handleMemberCard(stringData);
+      }
+
+      // TICKET BUTTON PRESSED
+      if (stringData.slice(0, 5) === "IN2ON") {
+        logger.info(`${this.name}: Button ticket pressed`);
+        if (this.state === "idle") return;
+        await this.proceed();
+      }
+
+      // RESET BUTTON PRESSED
+      if (stringData.slice(0, 3) === "IN3") {
+        logger.info(`${this.name}: Button reset pressed`);
+        this.state = "idle";
+      }
+
+      // HELP BUTTON PRESSED
+      if (stringData.slice(0, 5) === "IN4ON") {
+        logger.info(`${this.name}: Button help pressed`);
+        if (this.state === "idle") return;
+        this.runningText.showPleaseWait();
       }
     }
 
-    scan() {
-      const { name, device: path, id: access_gate_id } = this;
-      this.port = new SerialPort({
-        path,
-        baudRate: 9600,
-      });
+    openGate() {
+      this.socket.sendCommand("TRIG1");
+      logger.info(`${this.name}: Gate opened`);
 
-      console.log(`Connecting to gate ${name}...`);
+      setTimeout(() => {
+        this.state = "idle";
+      }, 3000);
+    }
 
-      this.port.on("open", () => {
-        console.log(`Serial ${path} (${name}) opened`);
-      });
+    async proceed(data = {}) {
+      const transactionData = {
+        gate_in_id: this.id,
+        jenis_kendaraan: this.jenis_kendaraan,
+        ...data,
+      };
 
-      const parser = this.port.pipe(new DelimiterParser({ delimiter: "#" }));
-      parser.on("data", async (bufferData) => {
-        const data = bufferData.toString();
-        console.log(`${name} : ${data}`);
-        const prefix = data[1];
+      logger.info(
+        `${this.name}: Proceeding with data: ${JSON.stringify(transactionData)}`
+      );
 
-        // skip kalau bukan detect card
-        if (!"WX".includes(prefix)) {
-          return;
-        }
+      try {
+        const { data } = await axios.post(
+          `${API_URL}/parkingTransaction/apiStore`,
+          transactionData
+        );
+        logger.info(
+          `${this.name}: ${data.message} - ${data.data.nomor_barcode} `
+        );
+        this.runningText.showThankYou();
+        this.openGate();
+      } catch (error) {
+        logger.error(
+          `${this.name}: ${error.response?.data?.message || error.message}`
+        );
 
-        let cardNumber = data.slice(2, 10);
-        cardNumber = parseInt(cardNumber, 16); // convert to decimal
-        console.log(`${name}: ${cardNumber}`);
+        this.runningText.setText("GAGAL|SILAKAN HUBUNGI PETUGAS");
+      }
+    }
 
-        try {
-          const log = await this.saveLog(cardNumber, prefix);
-          console.log(`${name}: ${JSON.stringify(log)}`);
-          // open gate
-          this.port.write(Buffer.from(`*TRIG1#`));
-        } catch (error) {
-          console.error(error.message);
-        }
-      });
+    async checkMembership(nomor_kartu, card_type) {
+      try {
+        const response = await axios.get(`${API_URL}/member/search`, {
+          params: { nomor_kartu, card_type, status: 1 },
+        });
+        return response.data;
+      } catch (error) {
+        logger.error(
+          `${this.name}: ${error.response?.data?.message || err.message}`
+        );
+        return null;
+      }
+    }
 
-      this.port.on("error", (error) => {
-        console.error(`${name} - ERROR - ${error.message}`);
-        this.reconnect();
+    async handleMemberCard(data) {
+      const cardData = data.slice(1);
+      const cardNumber = parseInt(cardData, 16).toString();
+      const member = await this.checkMembership(cardNumber, "RFID");
+
+      if (!member) {
+        this.runningText.setText("MAAF|KARTU TIDAK TERDAFTAR");
+        this.audio.playCardUnregistered();
+        return;
+      }
+
+      if (member.expired) {
+        this.runningText.setText("MAAF|KARTU HABIS MASA BERLAKU");
+        this.audio.playCardExpired();
+        return;
+      }
+
+      if (member.unclosed) {
+        this.runningText.setText("MAAF|KARTU BELUM SELESAI TRANSAKSI");
+        this.audio.playUnclosedTransaction();
+        return;
+      }
+
+      if (member.expired_in == 5) {
+        this.runningText.setText("MASA BERLAKU KARTU HABIS DALAM|5 HARI");
+        this.audio.playExpiredIn5Days();
+      }
+
+      if (member.expired_in == 1) {
+        this.runningText.setText("MASA BERLAKU KARTU HABIS DALAM|1 HARI");
+        this.audio.playExpiredIn1Day();
+      }
+
+      await this.proceed({
+        is_member: 1,
+        nomor_kartu: member.nomor_kartu,
+        member_id: member.id,
       });
     }
 
@@ -160,7 +299,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Gate.afterCreate(async (gate) => {
     try {
-      gate.scan();
+      gate.connect();
     } catch (error) {
       console.error(`${gate.name} - ERROR - ${error.message}`);
     }

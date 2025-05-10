@@ -43,7 +43,7 @@ app.use(require("./middlewares/errorHandler.middleware"));
 Gate.findAll()
   .then((gates) => {
     gates.forEach((gate) => {
-      gate.scan();
+      gate.connect();
     });
   })
   .catch((error) => {
