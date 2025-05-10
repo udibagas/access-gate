@@ -47,7 +47,7 @@ export default function GateTable() {
   return (
     <>
       <PageHeader title="Kelola Gate">
-        <AddButton label="Buat Gate Baru" onClick={handleAdd} />
+        <AddButton label="Tambah Gate" onClick={handleAdd} />
       </PageHeader>
 
       <DataTable<Gate> columns={columns} />

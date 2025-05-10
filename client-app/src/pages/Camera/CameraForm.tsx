@@ -7,7 +7,7 @@ export default function CameraForm({ visible, isEditing, onCancel, onOk, errors,
   return (
     <Modal
       width={450}
-      title={isEditing ? "Edit Kamera" : "Buat Kamera Baru"}
+      title={isEditing ? "Edit Kamera" : "Tambah Kamera"}
       open={visible}
       onCancel={onCancel}
       footer={[

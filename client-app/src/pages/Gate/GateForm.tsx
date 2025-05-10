@@ -7,7 +7,7 @@ export default function GateForm({ visible, isEditing, onCancel, onOk, errors, f
   return (
     <Modal
       width={450}
-      title={isEditing ? "Edit Gate" : "Buat Gate Baru"}
+      title={isEditing ? "Edit Gate" : "Tambah Gate"}
       open={visible}
       onCancel={onCancel}
       footer={[

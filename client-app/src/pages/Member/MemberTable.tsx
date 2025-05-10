@@ -80,7 +80,7 @@ export default function MemberTable() {
   return (
     <>
       <PageHeader title="Kelola Member">
-        <AddButton label="Buat Member Baru" onClick={handleAdd} />
+        <AddButton label="Tambah Member" onClick={handleAdd} />
         <Input.Search
           placeholder="Cari member"
           allowClear

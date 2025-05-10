@@ -73,7 +73,7 @@ export default function CameraTable() {
   return (
     <>
       <PageHeader title="Kelola Kamera">
-        <AddButton label="Buat Kamera Baru" onClick={handleAdd} />
+        <AddButton label="Tambah Kamera" onClick={handleAdd} />
       </PageHeader>
 
       <DataTable<Camera> columns={columns} />

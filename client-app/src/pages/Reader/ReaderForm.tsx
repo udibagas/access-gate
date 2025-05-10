@@ -22,7 +22,7 @@ export default function ReaderForm({ visible, isEditing, onCancel, onOk, errors,
   return (
     <Modal
       width={450}
-      title={isEditing ? "Edit Reader" : "Buat Reader Baru"}
+      title={isEditing ? "Edit Reader" : "Tambah Reader"}
       open={visible}
       onCancel={onCancel}
       footer={[

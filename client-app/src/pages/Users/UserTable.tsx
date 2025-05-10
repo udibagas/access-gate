@@ -49,8 +49,8 @@ export default function UserTable() {
 
   return (
     <>
-      <PageHeader title="Manage Users">
-        <AddButton label="Create New User" onClick={handleAdd} />
+      <PageHeader title="Kelola Users">
+        <AddButton label="Tambah User User" onClick={handleAdd} />
         <Input.Search
           placeholder="Search"
           allowClear

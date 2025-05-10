@@ -7,7 +7,7 @@ export default function UserForm({ visible, isEditing, onCancel, onOk, errors, f
   return (
     <Modal
       width={450}
-      title={isEditing ? "Edit User" : "Buat User Baru"}
+      title={isEditing ? "Edit User" : "Tambah User"}
       open={visible}
       onCancel={onCancel}
       footer={[

@@ -57,7 +57,7 @@ export default function ReaderTable() {
   return (
     <>
       <PageHeader title="Kelola Reader">
-        <AddButton label="Buat Reader Baru" onClick={handleAdd} />
+        <AddButton label="Tambah Reader" onClick={handleAdd} />
       </PageHeader>
 
       <DataTable<Reader> columns={columns} />

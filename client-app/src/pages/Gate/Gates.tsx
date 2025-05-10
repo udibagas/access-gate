@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 interface WebSocketMessage {
   level: 'debug' | 'info' | 'warn' | 'error';
   message: string;
-  timestamp: Date;
+  timestamp: string;
 }
 
 export default function Gates() {
@@ -58,7 +58,7 @@ export default function Gates() {
       <div className="bg-slate-800 p-4 h-[calc(100vh-150px)] overflow-y-auto text-green-500 font-mono">
         {log.map((message: WebSocketMessage, index: number) => (
           <div key={index} className="whitespace-pre-wrap">
-            {message.timestamp.toLocaleString('id-ID')} - {message.level.toUpperCase()} - {message.message}
+            {'$'} {new Date(message.timestamp).toLocaleString('id', { dateStyle: 'short', timeStyle: 'medium' })} [{message.level.toUpperCase()}] {message.message}
           </div>
         ))}
       </div>
