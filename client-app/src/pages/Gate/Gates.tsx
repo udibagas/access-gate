@@ -2,6 +2,7 @@ import { Gate } from "../../types";
 import GateTable from "./GateTable";
 import { DataTableProvider } from "../../providers/DataTableProvider";
 import { useEffect, useRef, useState } from "react";
+import moment from "moment";
 
 interface WebSocketMessage {
   level: 'debug' | 'info' | 'warn' | 'error';
@@ -58,7 +59,7 @@ export default function Gates() {
       <div className="bg-slate-800 p-4 h-[calc(100vh-150px)] overflow-y-auto text-green-500 font-mono">
         {log.map((message: WebSocketMessage, index: number) => (
           <div key={index} className="whitespace-pre-wrap">
-            {'$'} {new Date(message.timestamp).toLocaleString('id', { dateStyle: 'short', timeStyle: 'medium' })} [{message.level.toUpperCase()}] {message.message}
+            {'$'} {moment(message.timestamp).format('DD-MMM-YY HH:mm:ss')} [{message.level.toUpperCase()}] {message.message}
           </div>
         ))}
       </div>
