@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
         limit: 1,
       });
     }
+
+    get isExpired() {
+      return this.expiryDate && this.expiryDate < new Date();
+    }
   }
 
   Member.init(

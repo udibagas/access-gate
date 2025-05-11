@@ -6,6 +6,7 @@ const WebSocketTransport = require("../logger/WebsocketTransport");
 const MySocket = require("../lib/mysocket");
 const Audio = require("../lib/audio");
 const RunningText = require("../lib/runningtext");
+const connections = require("../connections");
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "debug",
@@ -32,12 +33,19 @@ module.exports = (sequelize, DataTypes) => {
       this.socket.removeAllListeners();
       this.socket.destroy();
 
+      const index = connections.findIndex((g) => g.id === this.id);
+
+      if (index !== -1) {
+        connections.splice(index, 1);
+      }
+
       setTimeout(() => {
         this.connect();
       }, 1000);
     }
 
     connect() {
+      this.socket.setKeepAlive(true, 5000);
       logger.info(`${this.name}: Connecting to ${this.device}`);
       this.socket.connect(5000, this.device, () => {
         logger.info(`${this.name}: Connected to ${this.device}:${5000}`);
@@ -49,6 +57,7 @@ module.exports = (sequelize, DataTypes) => {
     registerEventListeners() {
       this.socket.on("connect", () => {
         logger.info(`${this.name}: Connected`);
+        connections.push(this);
       });
 
       this.socket.on("data", (data) => {
@@ -99,8 +108,6 @@ module.exports = (sequelize, DataTypes) => {
       // TICKET BUTTON PRESSED
       if (stringData.slice(0, 5) === "IN2ON") {
         logger.info(`${this.name}: Button ticket pressed`);
-        if (this.state === "idle") return;
-        await this.proceed();
       }
 
       // RESET BUTTON PRESSED
@@ -126,117 +133,44 @@ module.exports = (sequelize, DataTypes) => {
       }, 3000);
     }
 
-    async proceed(data = {}) {
-      const transactionData = {
-        gate_in_id: this.id,
-        jenis_kendaraan: this.jenis_kendaraan,
-        ...data,
-      };
-
-      logger.info(
-        `${this.name}: Proceeding with data: ${JSON.stringify(transactionData)}`
-      );
-
-      try {
-        const { data } = await axios.post(
-          `${API_URL}/parkingTransaction/apiStore`,
-          transactionData
-        );
-        logger.info(
-          `${this.name}: ${data.message} - ${data.data.nomor_barcode} `
-        );
-        this.runningText.showThankYou();
-        this.openGate();
-      } catch (error) {
-        logger.error(
-          `${this.name}: ${error.response?.data?.message || error.message}`
-        );
-
-        this.runningText.setText("GAGAL|SILAKAN HUBUNGI PETUGAS");
-      }
-    }
-
-    async checkMembership(nomor_kartu, card_type) {
-      try {
-        const response = await axios.get(`${API_URL}/member/search`, {
-          params: { nomor_kartu, card_type, status: 1 },
-        });
-        return response.data;
-      } catch (error) {
-        logger.error(
-          `${this.name}: ${error.response?.data?.message || err.message}`
-        );
-        return null;
-      }
-    }
-
     async handleMemberCard(data) {
       const cardData = data.slice(1);
       const cardNumber = parseInt(cardData, 16).toString();
-      const member = await this.checkMembership(cardNumber, "RFID");
+      const { Member } = sequelize.models;
+      const member = await Member.findOne({ where: { cardNumber } });
 
       if (!member) {
+        logger.info(`${this.name}: Card number ${cardNumber} not registered`);
         this.runningText.setText("MAAF|KARTU TIDAK TERDAFTAR");
         this.audio.playCardUnregistered();
         return;
       }
 
-      if (member.expired) {
-        this.runningText.setText("MAAF|KARTU HABIS MASA BERLAKU");
+      if (member.status === false) {
+        logger.info(`${this.name}: Card number ${cardNumber} is not active`);
+        this.runningText.setText("MAAF|KARTU TIDAK AKTIF");
+        this.audio.playCardInactive();
+        return;
+      }
+
+      if (member.isExpired) {
+        logger.info(`${this.name}: Card number ${cardNumber} expired`);
+        this.runningText.setText("MAAF|KARTU EXPIRED");
         this.audio.playCardExpired();
         return;
       }
 
-      if (member.unclosed) {
-        this.runningText.setText("MAAF|KARTU BELUM SELESAI TRANSAKSI");
-        this.audio.playUnclosedTransaction();
-        return;
-      }
-
-      if (member.expired_in == 5) {
-        this.runningText.setText("MASA BERLAKU KARTU HABIS DALAM|5 HARI");
-        this.audio.playExpiredIn5Days();
-      }
-
-      if (member.expired_in == 1) {
-        this.runningText.setText("MASA BERLAKU KARTU HABIS DALAM|1 HARI");
-        this.audio.playExpiredIn1Day();
-      }
-
-      await this.proceed({
-        is_member: 1,
-        nomor_kartu: member.nomor_kartu,
-        member_id: member.id,
-      });
+      await this.saveLog(member, data[0]);
     }
 
-    async saveLog(cardNumber, prefix) {
+    async saveLog(member, prefix) {
+      const { Reader, AccessLog } = sequelize.models;
       // cari reader berdasarkan prefix
-      const Reader = sequelize.models.Reader;
-      const reader = await Reader.findOne({
-        where: {
-          prefix,
-        },
-      });
+      const reader = await Reader.findOne({ where: { prefix } });
 
       if (!reader) {
-        throw new Error(`Reader with prefix ${prefix} not found`);
-      }
-
-      // cari member berdasarkan cardNumber
-      const Member = sequelize.models.Member;
-      const member = await Member.findOne({
-        where: {
-          cardNumber,
-        },
-      });
-
-      if (!member) {
-        throw new Error(`Member with Card Number ${cardNumber} not found`);
-      }
-
-      if (member.status === false) {
-        throw new Error(`Member with Card Number ${cardNumber} is not active`);
+        logger.info(`Reader with prefix ${prefix} not found`);
+        return;
       }
 
       if (member.group == "member") {
@@ -244,18 +178,19 @@ module.exports = (sequelize, DataTypes) => {
 
         if (reader.type == "IN") {
           if (lastLog && lastLog.type == "IN") {
-            throw new Error(`Member with Card Number ${cardNumber} already IN`);
+            logger.info(`Member with Card Number ${cardNumber} already IN`);
+            return;
           }
         }
 
         if (reader.type == "OUT") {
           if (!lastLog || lastLog.type == "OUT") {
-            throw new Error(`Member with Card Number ${cardNumber} not IN yet`);
+            logger.info(`Member with Card Number ${cardNumber} not IN yet`);
+            return;
           }
         }
 
         // save log
-        AccessLog = sequelize.models.AccessLog;
         const log = await AccessLog.create({
           MemberId: member.id,
           ReaderId: reader.id,
@@ -303,6 +238,24 @@ module.exports = (sequelize, DataTypes) => {
     } catch (error) {
       console.error(`${gate.name} - ERROR - ${error.message}`);
     }
+  });
+
+  Gate.afterDestroy((gate) => {
+    const index = connections.findIndex((g) => g.id === gate.id);
+    if (index !== -1) {
+      connections.splice(index, 1);
+      gate.socket.destroy();
+    }
+  });
+
+  Gate.afterUpdate(async (gate) => {
+    const index = connections.findIndex((g) => g.id === gate.id);
+    if (index !== -1) {
+      connections.splice(index, 1);
+      gate.socket.destroy();
+    }
+
+    gate.connect();
   });
 
   return Gate;
