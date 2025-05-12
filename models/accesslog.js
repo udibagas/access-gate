@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     reader.cameras.forEach(async (camera) => {
-      const filepath = await camera.takeSnapshot(true);
+      const { filepath } = await camera.takeSnapshot(true);
       await Snapshot.create({
         AccessLogId: log.id,
         CameraId: camera.id,
