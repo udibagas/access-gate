@@ -156,7 +156,17 @@ module.exports = (sequelize, DataTypes) => {
         return;
       }
 
-      await this.saveLog(member, data[0]);
+      this.saveLog(member, data[0])
+        .then((log) => {
+          logger.info(JSON.stringify(log));
+          this.audio.playThankYou();
+          this.runningText.setText("TERIMA KASIH|SILAHKAN MASUK");
+          this.openGate();
+        })
+        .catch((err) => {
+          logger.error(`${this.name}: ${err.message}`);
+          this.runningText.setText("MAAF|GAGAL MENYIMPAN LOG");
+        });
     }
 
     async saveLog(member, prefix) {
@@ -168,8 +178,7 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       if (!reader) {
-        logger.info(`Reader with prefix ${prefix} not found`);
-        return;
+        throw new Error(`Reader with prefix ${prefix} not found`);
       }
 
       if (member.group == "member") {
@@ -177,15 +186,13 @@ module.exports = (sequelize, DataTypes) => {
 
         if (reader.type == "IN") {
           if (lastLog && lastLog.type == "IN") {
-            logger.info(`Member with Card Number ${cardNumber} already IN`);
-            return;
+            throw new Error(`Member with Card Number ${cardNumber} already IN`);
           }
         }
 
         if (reader.type == "OUT") {
           if (!lastLog || lastLog.type == "OUT") {
-            logger.info(`Member with Card Number ${cardNumber} not IN yet`);
-            return;
+            throw new Error(`Member with Card Number ${cardNumber} not IN yet`);
           }
         }
 
