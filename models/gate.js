@@ -160,7 +160,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     async saveLog(member, prefix) {
-      const { Reader, AccessLog, Snapshot } = sequelize.models;
+      const { Reader, AccessLog } = sequelize.models;
       // cari reader berdasarkan prefix
       const reader = await Reader.findOne({
         where: { prefix },
@@ -197,16 +197,6 @@ module.exports = (sequelize, DataTypes) => {
           cardNumber,
           vehicleNumber: member.vehicleNumber,
           type: reader.type,
-        });
-
-        // save snapshot
-        reader.cameras.forEach((camera) => {
-          const { filepath } = camera.takeSnapshot(true);
-          Snapshot.create({
-            AccessLogId: log.id,
-            CameraId: camera.id,
-            filepath,
-          });
         });
 
         return log;
