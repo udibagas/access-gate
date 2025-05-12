@@ -27,22 +27,20 @@ module.exports = (sequelize, DataTypes) => {
         const dir = fs.mkdirSync(`snapshots/` + moment().format("YYYY/MM/DD"), {
           recursive: true,
         });
-        const filePath = `${dir}/${this.name}-${Date.now()}.jpeg`;
+        const filepath = `${dir}/${this.name}-${Date.now()}.jpeg`;
 
-        fs.writeFile(filePath, response.data, (err) => {
+        fs.writeFile(filepath, response.data, (err) => {
           if (err) {
             return console.error("Error saving snapshot:", err);
           }
 
-          console.log("Snapshot saved to", filePath);
+          console.log("Snapshot saved to", filepath);
         });
       }
 
       // Convert arraybuffer to Base64
       const base64Image = Buffer.from(response.data).toString("base64");
-
-      // Return Base64-encoded string
-      return `data:image/jpeg;base64,${base64Image}`;
+      return { imgSrc: `data:image/jpeg;base64,${base64Image}`, filepath };
     }
   }
 
