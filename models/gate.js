@@ -32,20 +32,17 @@ module.exports = (sequelize, DataTypes) => {
     reconnect() {
       this.socket.removeAllListeners();
       this.socket.destroy();
-
-      const index = connections.findIndex((g) => g.id === this.id);
-
-      if (index !== -1) {
-        connections.splice(index, 1);
-      }
+      this.reload();
 
       setTimeout(() => {
         this.connect();
-      }, 1000);
+      }, 3000);
     }
 
     connect() {
       this.socket.setKeepAlive(true, 5000);
+      this.socket.setTimeout(10000);
+      connections.push(this);
       logger.info(`${this.name}: Connecting to ${this.device}`);
       this.socket.connect(5000, this.device, () => {
         logger.info(`${this.name}: Connected to ${this.device}:${5000}`);
@@ -57,7 +54,6 @@ module.exports = (sequelize, DataTypes) => {
     registerEventListeners() {
       this.socket.on("connect", () => {
         logger.info(`${this.name}: Connected`);
-        connections.push(this);
       });
 
       this.socket.on("data", (data) => {
@@ -164,9 +160,12 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     async saveLog(member, prefix) {
-      const { Reader, AccessLog } = sequelize.models;
+      const { Reader, AccessLog, Snapshot } = sequelize.models;
       // cari reader berdasarkan prefix
-      const reader = await Reader.findOne({ where: { prefix } });
+      const reader = await Reader.findOne({
+        where: { prefix },
+        include: "cameras",
+      });
 
       if (!reader) {
         logger.info(`Reader with prefix ${prefix} not found`);
@@ -198,6 +197,16 @@ module.exports = (sequelize, DataTypes) => {
           cardNumber,
           vehicleNumber: member.vehicleNumber,
           type: reader.type,
+        });
+
+        // save snapshot
+        reader.cameras.forEach((camera) => {
+          const { filepath } = camera.takeSnapshot(true);
+          Snapshot.create({
+            AccessLogId: log.id,
+            CameraId: camera.id,
+            filepath,
+          });
         });
 
         return log;
@@ -243,16 +252,18 @@ module.exports = (sequelize, DataTypes) => {
   Gate.afterDestroy((gate) => {
     const index = connections.findIndex((g) => g.id === gate.id);
     if (index !== -1) {
+      connections[index].socket.removeAllListeners();
+      connections[index].socket.destroy();
       connections.splice(index, 1);
-      gate.socket.destroy();
     }
   });
 
   Gate.afterUpdate(async (gate) => {
     const index = connections.findIndex((g) => g.id === gate.id);
     if (index !== -1) {
+      connections[index].socket.removeAllListeners();
+      connections[index].socket.destroy();
       connections.splice(index, 1);
-      gate.socket.destroy();
     }
 
     gate.connect();
