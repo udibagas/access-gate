@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
         password: this.password,
       });
 
+      console.log(digestAuth);
+
       const response = await digestAuth.request({
         method: "GET",
         url: this.url,
