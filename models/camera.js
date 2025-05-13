@@ -29,14 +29,11 @@ module.exports = (sequelize, DataTypes) => {
       }
 
       const buffer = await response.arrayBuffer();
-      console.log("Snapshot taken successfully");
-
-      const dir = fs.mkdirSync(`snapshots/` + moment().format("YYYY/MM/DD"), {
-        recursive: true,
-      });
+      const dir = `snapshots/` + moment().format("YYYY/MM/DD");
       const filepath = `${dir}/${this.name}-${Date.now()}.jpeg`;
 
       if (saveToFile) {
+        fs.mkdirSync(dir, { recursive: true });
         fs.writeFile(filepath, Buffer.from(buffer), (err) => {
           if (err) {
             return console.error("Error saving snapshot:", err);

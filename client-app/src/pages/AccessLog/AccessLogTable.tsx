@@ -17,9 +17,19 @@ export default function AccessLogTable() {
         return (<span>{formattedDate}</span>)
       }
     },
-    { title: "Gate", width: 100, dataIndex: "gate.name", key: "gate.name" },
+    {
+      title: "Gate",
+      width: 100,
+      key: "gate.name",
+      render: (_: string, record: AccessLogType) => record.gate.name,
+    },
     { title: "Jenis", width: 100, dataIndex: "type", key: "type", },
-    { title: "Nama", width: 150, dataIndex: "member.name", key: "member.name", },
+    {
+      title: "Nama",
+      width: 150,
+      key: "member.name",
+      render: (_: string, record: AccessLogType) => record.member.name,
+    },
     { title: "Nomor Kartu", width: 150, dataIndex: "cardNumber", key: "cardNumber", },
     { title: "Plat Nomor", width: 150, dataIndex: "vehicleNumber", key: "vehicleNumber", },
     {
