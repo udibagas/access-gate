@@ -135,8 +135,9 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     async handleMemberCard(data) {
-      const cardData = data.slice(1);
-      const cardNumber = parseInt(cardData, 16).toString();
+      // const cardData = data.slice(1);
+      // const cardNumber = parseInt(cardData, 16).toString();
+      const cardNumber = data.slice(2, 10);
       const { Member } = sequelize.models;
       const member = await Member.findOne({ where: { cardNumber } });
 
@@ -161,7 +162,7 @@ module.exports = (sequelize, DataTypes) => {
         return;
       }
 
-      this.saveLog(member, data[0])
+      this.saveLog(member, data.slice(0, 2))
         .then((log) => {
           logger.info(JSON.stringify(log));
           this.audio.playThankYou();
