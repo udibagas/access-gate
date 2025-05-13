@@ -44,16 +44,16 @@ module.exports = (sequelize, DataTypes) => {
           `Invalid content type: ${contentType}. Expected image/jpeg`
         );
       }
-      const buffer = await response.arrayBuffer();
 
+      const buffer = await response.arrayBuffer();
       console.log("Snapshot taken successfully");
 
-      if (saveToFile) {
-        const dir = fs.mkdirSync(`snapshots/` + moment().format("YYYY/MM/DD"), {
-          recursive: true,
-        });
-        const filepath = `${dir}/${this.name}-${Date.now()}.jpeg`;
+      const dir = fs.mkdirSync(`snapshots/` + moment().format("YYYY/MM/DD"), {
+        recursive: true,
+      });
+      const filepath = `${dir}/${this.name}-${Date.now()}.jpeg`;
 
+      if (saveToFile) {
         fs.writeFile(filepath, buffer, (err) => {
           if (err) {
             return console.error("Error saving snapshot:", err);
