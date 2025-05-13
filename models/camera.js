@@ -2,28 +2,11 @@
 const { Model } = require("sequelize");
 const fs = require("fs");
 const moment = require("moment");
-// const AxiosDigestAuth = require("@mhoc/axios-digest-auth").default;
 const DigestClient = require("digest-fetch");
 
 module.exports = (sequelize, DataTypes) => {
   class Camera extends Model {
     async takeSnapshot(saveToFile = false) {
-      // const digestAuth = new AxiosDigestAuth({
-      //   username: this.user,
-      //   password: this.password,
-      // });
-
-      // const response = await digestAuth.request({
-      //   method: "GET",
-      //   url: this.url,
-      //   responseType: "arraybuffer",
-      //   headers: {
-      //     "Content-Type": "image/jpeg",
-      //     Accept:
-      //       "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      //   },
-      // });
-
       const client = new DigestClient(this.user, this.password);
       const response = await client.fetch(this.url, {
         method: "GET",
