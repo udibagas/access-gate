@@ -99,7 +99,7 @@ module.exports = (sequelize, DataTypes) => {
 
       if (allowedPrefixes.includes(prefix)) {
         logger.info(`${this.name}: Member Card detected`);
-        if (this.state === "idle") return;
+        // if (this.state === "idle") return;
         await this.handleMemberCard(stringData);
       }
 
