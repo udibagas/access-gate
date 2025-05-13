@@ -161,7 +161,7 @@ module.exports = (sequelize, DataTypes) => {
 
       this.saveLog(member, data.slice(0, 2))
         .then((log) => {
-          logger.info(JSON.stringify(log));
+          console.log(log);
           this.audio.playThankYou();
           this.runningText.setText("TERIMA KASIH|SILAHKAN MASUK");
           this.openGate();
@@ -174,11 +174,7 @@ module.exports = (sequelize, DataTypes) => {
 
     async saveLog(member, prefix) {
       const { Reader, AccessLog } = sequelize.models;
-      // cari reader berdasarkan prefix
-      const reader = await Reader.findOne({
-        where: { prefix },
-        include: "cameras",
-      });
+      const reader = await Reader.findOne({ where: { prefix } });
 
       if (!reader) {
         throw new Error(`Reader with prefix ${prefix} not found`);
@@ -204,7 +200,7 @@ module.exports = (sequelize, DataTypes) => {
           MemberId: member.id,
           ReaderId: reader.id,
           GateId: this.id,
-          cardNumber,
+          cardNumber: member.cardNumber,
           vehicleNumber: member.vehicleNumber,
           type: reader.type,
         });
