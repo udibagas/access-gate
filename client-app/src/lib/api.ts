@@ -26,7 +26,7 @@ export interface DataTableServerResponse<TData> {
 
 export const axiosInstance = axios.create({
   // Dont forget to change this in production
-  baseURL: "http://localhost:3000",
+  // baseURL: "http://localhost:3000",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
