@@ -53,6 +53,8 @@ export default function Snapshot() {
     });
   }
 
+  const host = window.location.host;
+
   return (
     <>
       <PageHeader title="Snapshot">
@@ -71,7 +73,7 @@ export default function Snapshot() {
           />
         </div>
         <div className='flex items-center justify-center w-full border-1 border-gray-300 rounded-md p-4 h-[calc(100vh-230px)]'>
-          {selected.length > 0 && <Image src={`http://localhost:3000/` + selected[0]} alt="Snapshot" width={350} />}
+          {selected.length > 0 && <Image src={`http://${host}/` + selected[0]} alt="Snapshot" width={500} />}
         </div>
       </div>
     </>
