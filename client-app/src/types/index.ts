@@ -38,10 +38,16 @@ export interface Member {
   idNumber: string;
 }
 
+interface Snapshot {
+  filepath: string;
+  createdAt: string;
+}
+
 export interface AccessLogType {
   id: number;
   member: Member;
   gate: Gate;
+  snapshots: Snapshot[];
   reader: Reader;
   cardNumber: string;
   vehicleNumber: string;

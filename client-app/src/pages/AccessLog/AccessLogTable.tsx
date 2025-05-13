@@ -1,13 +1,41 @@
 import moment from "moment";
-import { ReloadOutlined } from "@ant-design/icons";
+import { CameraFilled, ReloadOutlined } from "@ant-design/icons";
 import DataTable from "../../components/DataTable";
 import PageHeader from "../../components/PageHeader";
-import { Input } from "antd";
+import { Image, Input, message, Modal } from "antd";
 import { useDataTableContext } from "../../hooks/useDataTable";
 import { AccessLogType } from "../../types";
 
 export default function AccessLogTable() {
   const { refreshData, setSearch, setCurrentPage } = useDataTableContext()
+
+  function showSnapshots(record: AccessLogType) {
+    if (record.snapshots?.length === 0) {
+      message.error("Tidak ada snapshot untuk log ini");
+      return;
+    }
+
+    const { protocol, host } = window.location;
+
+    Modal.info({
+      icon: false,
+      width: 900,
+      title: 'Snapshot',
+      content: (
+        <div className="grid grid-cols-2 gap-4">
+          {record.snapshots.map((snapshot, index) => {
+            const imgSrc = `${protocol}//${host}/${snapshot.filepath}`;
+            return (
+              <div key={index}>
+                <Image src={imgSrc} alt="Snapshot" />
+              </div>
+            )
+          }
+          )}
+        </div>
+      ),
+    });
+  }
 
   const columns = [
     {
@@ -38,7 +66,7 @@ export default function AccessLogTable() {
       align: "center" as const,
       width: 80,
       render: (_: string, record: AccessLogType) => (
-        record.id
+        <CameraFilled onClick={() => showSnapshots(record)} />
       ),
     },
   ];
