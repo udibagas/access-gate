@@ -61,6 +61,8 @@ export default function CameraTable() {
       .then((response) => {
         console.log("Camera is reachable", response);
         Modal.info({
+          icon: false,
+          width: 800,
           title: record.name,
           content: <Image src={response.data.imgSrc} alt={record.name} />,
         });
