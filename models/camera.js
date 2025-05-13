@@ -2,28 +2,49 @@
 const { Model } = require("sequelize");
 const fs = require("fs");
 const moment = require("moment");
-const AxiosDigestAuth = require("@mhoc/axios-digest-auth").default;
+// const AxiosDigestAuth = require("@mhoc/axios-digest-auth").default;
+const DigestClient = require("digest-fetch");
 
 module.exports = (sequelize, DataTypes) => {
   class Camera extends Model {
     async takeSnapshot(saveToFile = false) {
-      const digestAuth = new AxiosDigestAuth({
-        username: this.user,
-        password: this.password,
-      });
+      // const digestAuth = new AxiosDigestAuth({
+      //   username: this.user,
+      //   password: this.password,
+      // });
 
-      console.log(digestAuth);
+      // const response = await digestAuth.request({
+      //   method: "GET",
+      //   url: this.url,
+      //   responseType: "arraybuffer",
+      //   headers: {
+      //     "Content-Type": "image/jpeg",
+      //     Accept:
+      //       "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      //   },
+      // });
 
-      const response = await digestAuth.request({
+      const client = new DigestClient(this.user, this.password);
+      const response = await client.fetch(this.url, {
         method: "GET",
-        url: this.url,
-        responseType: "arraybuffer",
         headers: {
           "Content-Type": "image/jpeg",
           Accept:
             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
       });
+      if (!response.ok) {
+        throw new Error(
+          `Failed to take snapshot: ${response.status} ${response.statusText}`
+        );
+      }
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("image/jpeg")) {
+        throw new Error(
+          `Invalid content type: ${contentType}. Expected image/jpeg`
+        );
+      }
+      const buffer = await response.arrayBuffer();
 
       console.log("Snapshot taken successfully");
 
@@ -33,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
         });
         const filepath = `${dir}/${this.name}-${Date.now()}.jpeg`;
 
-        fs.writeFile(filepath, response.data, (err) => {
+        fs.writeFile(filepath, buffer, (err) => {
           if (err) {
             return console.error("Error saving snapshot:", err);
           }
@@ -43,7 +64,8 @@ module.exports = (sequelize, DataTypes) => {
       }
 
       // Convert arraybuffer to Base64
-      const base64Image = Buffer.from(response.data).toString("base64");
+      // const base64Image = Buffer.from(buffer).toString("base64");
+      const base64Image = buffer.toString("base64");
       return { imgSrc: `data:image/jpeg;base64,${base64Image}`, filepath };
     }
   }
