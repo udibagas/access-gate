@@ -160,7 +160,7 @@ module.exports = (sequelize, DataTypes) => {
         return;
       }
 
-      this.saveLog(member, data.slice(0, 2))
+      this.saveLog(member, data.slice(0, prefixLength))
         .then((log) => {
           console.log(log);
           this.audio.playThankYou();
