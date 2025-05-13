@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       const filepath = `${dir}/${this.name}-${Date.now()}.jpeg`;
 
       if (saveToFile) {
-        fs.writeFile(filepath, buffer, (err) => {
+        fs.writeFile(filepath, Buffer.from(buffer), (err) => {
           if (err) {
             return console.error("Error saving snapshot:", err);
           }
