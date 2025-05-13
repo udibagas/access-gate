@@ -62,7 +62,7 @@ export default function CameraTable() {
         console.log("Camera is reachable", response);
         Modal.info({
           title: record.name,
-          content: <Image src={response.data} alt={record.name} />,
+          content: <Image src={response.data.imgSrc} alt={record.name} />,
         });
       })
       .catch((error) => {
