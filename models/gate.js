@@ -92,7 +92,8 @@ module.exports = (sequelize, DataTypes) => {
       }
 
       // MEMBER CARD DETECTED
-      const prefix = stringData.slice(0, 2);
+      const prefixLength = isNaN(+stringData[1]) ? 2 : 1;
+      const prefix = stringData.slice(0, prefixLength);
       const allowedPrefixes = (await sequelize.models.Reader.findAll()).map(
         (r) => r.prefix
       );
@@ -100,7 +101,7 @@ module.exports = (sequelize, DataTypes) => {
       if (allowedPrefixes.includes(prefix)) {
         logger.info(`${this.name}: Member Card detected`);
         // if (this.state === "idle") return;
-        await this.handleMemberCard(stringData);
+        await this.handleMemberCard(stringData, prefixLength);
       }
 
       // TICKET BUTTON PRESSED
@@ -131,10 +132,10 @@ module.exports = (sequelize, DataTypes) => {
       }, 3000);
     }
 
-    async handleMemberCard(data) {
+    async handleMemberCard(data, prefixLength) {
       // const cardData = data.slice(1);
       // const cardNumber = parseInt(cardData, 16).toString();
-      const cardNumber = data.slice(2, 10);
+      const cardNumber = data.slice(prefixLength);
       const { Member } = sequelize.models;
       const member = await Member.findOne({ where: { cardNumber } });
 
