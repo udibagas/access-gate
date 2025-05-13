@@ -56,7 +56,7 @@ export default function Gates() {
         </DataTableProvider>
       </div>
 
-      <div className="bg-slate-800 p-4 h-[calc(100vh-150px)] overflow-y-auto text-green-500 font-mono">
+      <div className="bg-slate-800 p-4 h-[calc(100vh-150px)] overflow-y-auto text-green-500 font-mono text-sm">
         {log.map((message: WebSocketMessage, index: number) => (
           <div key={index} className="whitespace-pre-wrap">
             {'$'} {moment(message.timestamp).format('DD-MMM-YY HH:mm:ss')} [{message.level.toUpperCase()}] {message.message}
