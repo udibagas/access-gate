@@ -94,8 +94,13 @@ module.exports = (sequelize, DataTypes) => {
         this.state = "idle";
       }
 
-      // MEMBER CARD TAPPED
-      if (stringData[0] === "W") {
+      // MEMBER CARD DETECTED
+      const prefix = stringData.slice(0, 2);
+      const allowedPrefixes = (await sequelize.models.Reader.findAll()).map(
+        (r) => r.prefix
+      );
+
+      if (allowedPrefixes.includes(prefix)) {
         logger.info(`${this.name}: Member Card detected`);
         if (this.state === "idle") return;
         await this.handleMemberCard(stringData);
