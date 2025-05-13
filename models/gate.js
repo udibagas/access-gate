@@ -12,11 +12,8 @@ const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "debug",
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.printf(({ timestamp, level, message }) => {
-      const formattedTimestamp = moment(timestamp).format(
-        "YYYY-MM-DD HH:mm:ss"
-      );
-      return `${formattedTimestamp} [${level.toUpperCase()}] ${message}`;
+    winston.format.printf(({ level, message }) => {
+      return `[${level.toUpperCase()}] ${message}`;
     })
   ),
   transports: [new winston.transports.Console(), new WebSocketTransport()],
