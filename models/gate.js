@@ -194,19 +194,19 @@ module.exports = (sequelize, DataTypes) => {
             throw new Error(`Member with Card Number ${cardNumber} not IN yet`);
           }
         }
-
-        // save log
-        const log = await AccessLog.create({
-          MemberId: member.id,
-          ReaderId: reader.id,
-          GateId: this.id,
-          cardNumber: member.cardNumber,
-          vehicleNumber: member.vehicleNumber,
-          type: reader.type,
-        });
-
-        return log;
       }
+
+      // save log
+      const log = await AccessLog.create({
+        MemberId: member.id,
+        ReaderId: reader.id,
+        GateId: this.id,
+        cardNumber: member.cardNumber,
+        vehicleNumber: member.vehicleNumber,
+        type: reader.type,
+      });
+
+      return log;
     }
   }
 
