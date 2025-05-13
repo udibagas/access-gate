@@ -64,8 +64,7 @@ module.exports = (sequelize, DataTypes) => {
       }
 
       // Convert arraybuffer to Base64
-      // const base64Image = Buffer.from(buffer).toString("base64");
-      const base64Image = buffer.toString("base64");
+      const base64Image = Buffer.from(buffer).toString("base64");
       return { imgSrc: `data:image/jpeg;base64,${base64Image}`, filepath };
     }
   }
