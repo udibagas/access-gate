@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
 
       setTimeout(() => {
         this.connect();
-      }, 3000);
+      }, 1000);
     }
 
     connect() {
