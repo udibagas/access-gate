@@ -17,7 +17,9 @@ module.exports = (sequelize, DataTypes) => {
         url: this.url,
         responseType: "arraybuffer",
         headers: {
-          Accept: "image/jpeg",
+          "Content-Type": "image/jpeg",
+          Accept:
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
       });
 

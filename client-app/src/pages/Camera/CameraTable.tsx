@@ -66,7 +66,7 @@ export default function CameraTable() {
         });
       })
       .catch((error) => {
-        message.error(`Error reaching camera. ${error.message}`);
+        message.error(error.response.data.message);
       });
   }
 
