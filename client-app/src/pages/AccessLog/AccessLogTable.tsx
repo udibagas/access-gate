@@ -19,10 +19,10 @@ export default function AccessLogTable() {
 
     Modal.info({
       icon: false,
-      width: 900,
+      width: 800,
       title: 'Snapshot',
       content: (
-        <div className="grid grid-cols-2 gap-4">
+        <div className={`grid ${record.snapshots.length > 1 ? "grid-cols-2" : "grid-cols-1"} gap-4`}>
           {record.snapshots.map((snapshot, index) => {
             const imgSrc = `${protocol}//${host}/${snapshot.filepath}`;
             return (
